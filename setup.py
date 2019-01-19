@@ -66,6 +66,13 @@ setup(
 
     setup_requires=['setuptools_scm>=1.15'],
 
+    test_suite='nose.collector',
+
+    tests_require=[
+        'nose',
+        'nose-parameterized',
+    ],
+
     # This field lists other packages that your project depends on to run.
     # Any package you put here will be installed by pip when your project is
     # installed, so they must be valid existing projects.
