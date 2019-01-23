@@ -37,7 +37,7 @@ class CanvasAPI:
                 r.raise_for_status()
                 return (r.json(), r.headers["Link"])
             except HTTPError as e:
-                if e.response.status_code < 500:
+                if e.response is None or e.response.status_code < 500:
                     raise
 
                 tries += 1
@@ -72,6 +72,8 @@ class CanvasAPI:
             return result
 
         except HTTPError as e:
+            raiseNameResolutionFailed(e)
+
             logging.debug("Got HTTP status %d\n", e.response.status_code)
             raiseAuthenticationFailed(e)
             raise
@@ -117,4 +119,21 @@ def raiseCourseNotFound(err: HTTPError):
     raise CourseNotFound(err)
 
 class CourseNotFound(Exception):
+    pass
+
+
+def raiseNameResolutionFailed(err: HTTPError):
+    if err.response is not None:
+        return
+
+    if err.request is not None:
+        return
+
+    print(str(err))
+    if "Name or service not known" not in str(err):
+        return
+
+    raise NameResolutionFailed(err)
+
+class NameResolutionFailed(Exception):
     pass

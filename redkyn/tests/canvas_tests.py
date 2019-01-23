@@ -1,6 +1,6 @@
 from redkyn.tests.utils import TestCase
 
-from redkyn.canvas import CanvasAPI, AuthenticationFailed, CourseNotFound
+from redkyn.canvas import CanvasAPI, AuthenticationFailed, CourseNotFound, NameResolutionFailed
 
 from requests.exceptions import HTTPError
 
@@ -41,6 +41,17 @@ class CanvasTestCase(TestCase):
 
         api = CanvasAPI("test token", "mst.instructure.com")
         with self.assertRaises(CourseNotFound):
+            api.get_course_students(420)
+
+    def test_failed_dns(self):
+        self.mock_get.side_effect = HTTPError("Name or service not known")
+
+        api = CanvasAPI("test token", "mst.instructure.com")
+
+        with self.assertRaises(NameResolutionFailed):
+            api.get_instructor_courses()
+
+        with self.assertRaises(NameResolutionFailed):
             api.get_course_students(420)
 
     def test_retries_on_5xx(self):
