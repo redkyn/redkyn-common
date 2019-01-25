@@ -7,7 +7,7 @@ Redkyn-common |pypi| |travis|
 .. |travis| image:: https://travis-ci.org/redkyn/redkyn-common.svg?branch=master
     :target: https://travis-ci.org/redkyn/redkyn-common
 
-Common libraries for `Assigner <https://github.com/redkyn/assigner>`_ and `Grader <https://github.com/redkyn/grader`_.
+Common libraries for `Assigner <https://github.com/redkyn/assigner>`_ and `Grader <https://github.com/redkyn/grader>`_.
 
 Libraries
 ---------
