@@ -5,6 +5,12 @@ from urllib.parse import urljoin
 import logging
 import time
 
+from redkyn.canvas.exceptions import (
+    raiseAuthenticationFailed,
+    raiseCourseNotFound,
+    raiseNameResolutionFailed,
+)
+
 from typing import Tuple
 
 
@@ -99,41 +105,3 @@ class CanvasAPI:
         except HTTPError as e:
             raiseCourseNotFound(e)
             raise
-
-
-
-def raiseAuthenticationFailed(err: HTTPError):
-    if err.response.status_code != 401:
-        return
-
-    raise AuthenticationFailed(err)
-
-class AuthenticationFailed(Exception):
-    pass
-
-
-def raiseCourseNotFound(err: HTTPError):
-    if err.response.status_code != 404:
-        return
-
-    raise CourseNotFound(err)
-
-class CourseNotFound(Exception):
-    pass
-
-
-def raiseNameResolutionFailed(err: HTTPError):
-    if err.response is not None:
-        return
-
-    if err.request is not None:
-        return
-
-    print(str(err))
-    if "Name or service not known" not in str(err):
-        return
-
-    raise NameResolutionFailed(err)
-
-class NameResolutionFailed(Exception):
-    pass

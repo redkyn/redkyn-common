@@ -1,6 +1,7 @@
 from redkyn.tests.utils import TestCase
 
-from redkyn.canvas import CanvasAPI, AuthenticationFailed, CourseNotFound, NameResolutionFailed
+from redkyn.canvas import CanvasAPI
+from redkyn.canvas.exceptions import AuthenticationFailed, CourseNotFound, NameResolutionFailed
 
 from requests.exceptions import HTTPError
 
