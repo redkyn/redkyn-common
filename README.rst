@@ -11,3 +11,4 @@ Common libraries for `Assigner <https://github.com/redkyn/assigner>`_ and `Grade
 
 Libraries
 ---------
+- ``canvas``: An API wrapper for getting course information from Canvas

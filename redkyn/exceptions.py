@@ -1,0 +1,2 @@
+class RedkynError(Exception):
+    pass

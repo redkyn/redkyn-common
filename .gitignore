@@ -1,0 +1,10 @@
+# vim swapfiles
+.*.sw?
+
+# setup.py stuff
+.eggs/
+dist/
+*.egg-info/
+
+# pycache
+__pycache__/
