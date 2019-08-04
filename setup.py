@@ -78,6 +78,7 @@ setup(
     # installed, so they must be valid existing projects.
     install_requires=[
         'requests>=2.20.0',
+        'typing>=3.5;python_version<"3.5"',
     ],
 
     python_requires='>=3.4',
