@@ -5,6 +5,7 @@ from unittest.mock import patch
 class TestCase(unittest.TestCase):
     @classmethod
     def tearDownClass(cls):
+        # pylint: disable=C0321
         if hasattr(cls, "_CLASS_CLEANUP"):
             for x in cls._CLASS_CLEANUP:
                 x()
