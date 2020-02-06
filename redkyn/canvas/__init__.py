@@ -41,7 +41,10 @@ class CanvasAPI:
             try:
                 r = requests.get(url, params=params, headers=self.REQUEST_HEADER)
                 r.raise_for_status()
-                return (r.json(), r.headers["Link"])
+                if "Link" in r.headers:
+                    return (r.json(), r.headers["Link"])
+                else:
+                    return (r.json(), "")
             except HTTPError as e:
                 if e.response is None or e.response.status_code < 500:
                     raise
@@ -63,7 +66,6 @@ class CanvasAPI:
         """
         try:
             (result, link_header) = self._get_request(url, params)
-
             count = len(result)
             page = 1
             while 'rel="next"' in link_header:
@@ -84,6 +86,29 @@ class CanvasAPI:
             raiseAuthenticationFailed(e)
             raise
 
+    def _put_request(self, url: str, params: dict = None, attempts: int = 5) -> Tuple[str, str]:
+        url = urljoin(self.website_root, url)
+        tries = 0
+        while tries < attempts:
+            try:
+                r = requests.put(url, params=params, headers=self.REQUEST_HEADER)
+                r.raise_for_status()
+                if "Link" in r.headers:
+                    return (r.json(), r.headers["Link"])
+                else:
+                    return (r.json(), "")
+            except HTTPError as e:
+                if e.response is None or e.response.status_code < 500:
+                    raise
+
+                tries += 1
+                if tries == attempts:
+                    raise
+
+                logging.debug("Caught %d exception in request after %d tries. Will retry %d more times.",
+                              e.response.status_code, tries, attempts - tries, exc_info=True)
+                time.sleep(0.5 * 2 ** (tries - 1))
+
     def get_instructor_courses(self):
         get = lambda x: self._get_all_pages('/api/v1/courses',
                                             {'enrollment_type': x, 'state': ['available']})
@@ -101,6 +126,59 @@ class CanvasAPI:
             }
             result = self._get_all_pages('/api/v1/courses/%s/users' % course_id, params)
             return result
+
+        except HTTPError as e:
+            raiseCourseNotFound(e)
+            raise
+
+    def get_student_from_username(self, course_id: str, sis_user_id: str):
+        try:
+            params = {
+                'per_page': 50
+            }
+            result = self._get_all_pages('/api/v1/courses/%s/users/sis_user_id:%s' %\
+                     (course_id, sis_user_id), params)
+            return result
+
+        except HTTPError as e:
+            raiseCourseNotFound(e)
+            raise
+
+    def get_course_assignments(self, course_id: str, search_term: str = ''):
+        try:
+            params = {
+                'per_page': 50
+            }
+            if search_term:
+                params['search_term'] = search_term
+            result = self._get_all_pages('/api/v1/courses/%s/assignments' % course_id, params)
+            return result
+
+        except HTTPError as e:
+            raiseCourseNotFound(e)
+            raise
+
+    def get_assignment_submissions(self, course_id: str, assignment_id: str, student_id: str):
+        try:
+            params = {
+                'per_page': 50
+            }
+            result = self._get_all_pages('/api/v1/courses/%s/assignments/%s/submissions/%s' %\
+                     (course_id, assignment_id, student_id), params)
+            return result
+
+        except HTTPError as e:
+            raiseCourseNotFound(e)
+            raise
+
+    def put_assignment_submission(self, course_id: str, assignment_id: str, student_id: str, score: float):
+        try:
+            params = {
+                'submission[posted_grade]': score
+            }
+            # result = self._put_request('/api/v1/courses/%s/assignments/%s/submissions/%s' %\
+            #          (course_id, assignment_id, student_id), params)
+            # return result
 
         except HTTPError as e:
             raiseCourseNotFound(e)
