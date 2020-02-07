@@ -176,9 +176,9 @@ class CanvasAPI:
             params = {
                 'submission[posted_grade]': score
             }
-            # result = self._put_request('/api/v1/courses/%s/assignments/%s/submissions/%s' %\
-            #          (course_id, assignment_id, student_id), params)
-            # return result
+            result = self._put_request('/api/v1/courses/%s/assignments/%s/submissions/%s' %\
+                     (course_id, assignment_id, student_id), params)
+            return result
 
         except HTTPError as e:
             raiseCourseNotFound(e)

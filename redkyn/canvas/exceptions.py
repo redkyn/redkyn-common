@@ -20,6 +20,8 @@ def raiseCourseNotFound(err: HTTPError):
 class CourseNotFound(RedkynError):
     pass
 
+class AssignmentNotFound(RedkynError):
+    pass
 
 def raiseNameResolutionFailed(err: HTTPError):
     if err.response is not None:
