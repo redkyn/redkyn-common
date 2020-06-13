@@ -17,14 +17,12 @@ from typing import Tuple
 # Transparently use a common TLS session for each request
 requests = requests.Session()
 
+
 class CanvasAPI:
-    REQUEST_HEADER = {
-        "Authorization": "Bearer ",
-        "Content-Type": "application/json"
-    }
+    REQUEST_HEADER = {"Authorization": "Bearer ", "Content-Type": "application/json"}
 
     def __init__(self, canvas_token: str, website_root: str):
-        self.REQUEST_HEADER['Authorization'] += canvas_token
+        self.REQUEST_HEADER["Authorization"] += canvas_token
 
         if website_root.startswith("http://"):
             website_root = website_root[7:]
@@ -34,7 +32,9 @@ class CanvasAPI:
 
         self.website_root = website_root
 
-    def _get_request(self, url: str, params: dict = None, attempts: int = 5) -> Tuple[str, str]:
+    def _get_request(
+        self, url: str, params: dict = None, attempts: int = 5
+    ) -> Tuple[str, str]:
         url = urljoin(self.website_root, url)
         tries = 0
         while tries < attempts:
@@ -53,8 +53,13 @@ class CanvasAPI:
                 if tries == attempts:
                     raise
 
-                logging.debug("Caught %d exception in request after %d tries. Will retry %d more times.",
-                              e.response.status_code, tries, attempts - tries, exc_info=True)
+                logging.debug(
+                    "Caught %d exception in request after %d tries. Will retry %d more times.",
+                    e.response.status_code,
+                    tries,
+                    attempts - tries,
+                    exc_info=True,
+                )
                 time.sleep(0.5 * 2 ** (tries - 1))
 
     def _get_all_pages(self, url: str, params: dict = None) -> list:
@@ -71,8 +76,8 @@ class CanvasAPI:
             while 'rel="next"' in link_header:
                 page += 1
 
-                params['per_page'] = count
-                params['page'] = page
+                params["per_page"] = count
+                params["page"] = page
                 (next_result, link_header) = self._get_request(url, params)
 
                 result.extend(next_result)
@@ -86,7 +91,9 @@ class CanvasAPI:
             raiseAuthenticationFailed(e)
             raise
 
-    def _put_request(self, url: str, params: dict = None, attempts: int = 5) -> Tuple[str, str]:
+    def _put_request(
+        self, url: str, params: dict = None, attempts: int = 5
+    ) -> Tuple[str, str]:
         url = urljoin(self.website_root, url)
         tries = 0
         while tries < attempts:
@@ -105,26 +112,32 @@ class CanvasAPI:
                 if tries == attempts:
                     raise
 
-                logging.debug("Caught %d exception in request after %d tries. Will retry %d more times.",
-                              e.response.status_code, tries, attempts - tries, exc_info=True)
+                logging.debug(
+                    "Caught %d exception in request after %d tries. Will retry %d more times.",
+                    e.response.status_code,
+                    tries,
+                    attempts - tries,
+                    exc_info=True,
+                )
                 time.sleep(0.5 * 2 ** (tries - 1))
 
     def get_instructor_courses(self):
-        get = lambda x: self._get_all_pages('/api/v1/courses',
-                                            {'enrollment_type': x, 'state': ['available']})
-        result = get('teacher')
-        result.extend(get('ta'))
-        result.extend(get('grader'))
+        get = lambda x: self._get_all_pages(
+            "/api/v1/courses", {"enrollment_type": x, "state": ["available"]}
+        )
+        result = get("teacher")
+        result.extend(get("ta"))
+        result.extend(get("grader"))
         return result
 
     def get_course_students(self, course_id: str):
         try:
             params = {
-                'per_page': 50,
-                'enrollment_type': ['student'],
-                'enrollment_state': ['active']
+                "per_page": 50,
+                "enrollment_type": ["student"],
+                "enrollment_state": ["active"],
             }
-            result = self._get_all_pages('/api/v1/courses/%s/users' % course_id, params)
+            result = self._get_all_pages("/api/v1/courses/%s/users" % course_id, params)
             return result
 
         except HTTPError as e:
@@ -133,51 +146,69 @@ class CanvasAPI:
 
     def get_student_from_username(self, course_id: str, sis_user_id: str):
         try:
-            params = {
-                'per_page': 50
-            }
-            result = self._get_all_pages('/api/v1/courses/%s/users/sis_user_id:%s' %\
-                     (course_id, sis_user_id), params)
+            params = {"per_page": 50}
+            result = self._get_all_pages(
+                "/api/v1/courses/%s/users/sis_user_id:%s" % (course_id, sis_user_id),
+                params,
+            )
             return result
 
         except HTTPError as e:
             raiseCourseNotFound(e)
             raise
 
-    def get_course_assignments(self, course_id: str, search_term: str = ''):
+    def get_course_assignments(self, course_id: str, search_term: str = ""):
         try:
-            params = {
-                'per_page': 50
-            }
+            params = {"per_page": 50}
             if search_term:
-                params['search_term'] = search_term
-            result = self._get_all_pages('/api/v1/courses/%s/assignments' % course_id, params)
+                params["search_term"] = search_term
+            result = self._get_all_pages(
+                "/api/v1/courses/%s/assignments" % course_id, params
+            )
             return result
 
         except HTTPError as e:
             raiseCourseNotFound(e)
             raise
 
-    def get_assignment_submissions(self, course_id: str, assignment_id: str, student_id: str):
+    def get_assignment(self, course_id: str, assignment_id: str):
         try:
-            params = {
-                'per_page': 50
-            }
-            result = self._get_all_pages('/api/v1/courses/%s/assignments/%s/submissions/%s' %\
-                     (course_id, assignment_id, student_id), params)
+            params = {}
+            result = self._get_all_pages(
+                "/api/v1/courses/%s/assignments/%s" % (course_id, assignment_id), params
+            )
             return result
 
         except HTTPError as e:
             raiseCourseNotFound(e)
             raise
 
-    def put_assignment_submission(self, course_id: str, assignment_id: str, student_id: str, score: float):
+    def get_assignment_submissions(
+        self, course_id: str, assignment_id: str, student_id: str
+    ):
         try:
-            params = {
-                'submission[posted_grade]': score
-            }
-            result = self._put_request('/api/v1/courses/%s/assignments/%s/submissions/%s' %\
-                     (course_id, assignment_id, student_id), params)
+            params = {"per_page": 50}
+            result = self._get_all_pages(
+                "/api/v1/courses/%s/assignments/%s/submissions/%s"
+                % (course_id, assignment_id, student_id),
+                params,
+            )
+            return result
+
+        except HTTPError as e:
+            raiseCourseNotFound(e)
+            raise
+
+    def put_assignment_submission(
+        self, course_id: str, assignment_id: str, student_id: str, score: float
+    ):
+        try:
+            params = {"submission[posted_grade]": score}
+            result = self._put_request(
+                "/api/v1/courses/%s/assignments/%s/submissions/%s"
+                % (course_id, assignment_id, student_id),
+                params,
+            )
             return result
 
         except HTTPError as e:
