@@ -11,7 +11,7 @@ from redkyn.canvas.exceptions import (
     raiseNameResolutionFailed,
 )
 
-from typing import Tuple
+from typing import Tuple, Dict, Any
 
 
 # Transparently use a common TLS session for each request
@@ -176,6 +176,20 @@ class CanvasAPI:
             params = {}
             result = self._get_all_pages(
                 "/api/v1/courses/%s/assignments/%s" % (course_id, assignment_id), params
+            )
+            return result
+
+        except HTTPError as e:
+            raiseCourseNotFound(e)
+            raise
+
+    def put_assignment(
+        self, course_id: str, assignment_id: str, params: Dict[str, Any]
+    ) -> None:
+        try:
+            result = self._put_request(
+                "/api/v1/courses/%s/assignments/%s" % (course_id, assignment_id),
+                params,
             )
             return result
 
