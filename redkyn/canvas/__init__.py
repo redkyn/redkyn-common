@@ -171,34 +171,6 @@ class CanvasAPI:
             raiseCourseNotFound(e)
             raise
 
-    def get_assignment(self, course_id: str, assignment_id: str):
-        try:
-            params = {}
-            result = self._get_all_pages(
-                "/api/v1/courses/%s/assignments/%s" % (course_id, assignment_id), params
-            )
-            return result
-
-        except HTTPError as e:
-            raiseCourseNotFound(e)
-            raise
-
-    def get_assignment_submissions(
-        self, course_id: str, assignment_id: str, student_id: str
-    ):
-        try:
-            params = {"per_page": 50}
-            result = self._get_all_pages(
-                "/api/v1/courses/%s/assignments/%s/submissions/%s"
-                % (course_id, assignment_id, student_id),
-                params,
-            )
-            return result
-
-        except HTTPError as e:
-            raiseCourseNotFound(e)
-            raise
-
     def put_assignment_submission(
         self, course_id: str, assignment_id: str, student_id: str, score: float
     ):
