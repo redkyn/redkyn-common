@@ -1,11 +1,13 @@
 from redkyn.exceptions import RedkynError
 from requests.exceptions import HTTPError
 
+
 def raiseAuthenticationFailed(err: HTTPError):
     if err.response.status_code != 401:
         return
 
     raise AuthenticationFailed(err)
+
 
 class AuthenticationFailed(RedkynError):
     pass
@@ -17,11 +19,25 @@ def raiseCourseNotFound(err: HTTPError):
 
     raise CourseNotFound(err)
 
+
+def raiseStudentNotFound(err: HTTPError):
+    if err.response.status_code != 404:
+        return
+
+    raise StudentNotFound(err)
+
+
 class CourseNotFound(RedkynError):
     pass
 
+
 class AssignmentNotFound(RedkynError):
     pass
+
+
+class StudentNotFound(RedkynError):
+    pass
+
 
 def raiseNameResolutionFailed(err: HTTPError):
     if err.response is not None:
@@ -34,6 +50,7 @@ def raiseNameResolutionFailed(err: HTTPError):
         return
 
     raise NameResolutionFailed(err)
+
 
 class NameResolutionFailed(RedkynError):
     pass

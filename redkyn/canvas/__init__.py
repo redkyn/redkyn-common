@@ -8,6 +8,7 @@ import time
 from redkyn.canvas.exceptions import (
     raiseAuthenticationFailed,
     raiseCourseNotFound,
+    raiseStudentNotFound,
     raiseNameResolutionFailed,
 )
 
@@ -154,7 +155,7 @@ class CanvasAPI:
             return result
 
         except HTTPError as e:
-            raiseCourseNotFound(e)
+            raiseStudentNotFound(e)
             raise
 
     def get_course_assignments(self, course_id: str, search_term: str = ""):
@@ -184,5 +185,5 @@ class CanvasAPI:
             return result
 
         except HTTPError as e:
-            raiseCourseNotFound(e)
+            raiseStudentNotFound(e)
             raise
