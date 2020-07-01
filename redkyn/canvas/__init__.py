@@ -44,8 +44,7 @@ class CanvasAPI:
                 r.raise_for_status()
                 if "Link" in r.headers:
                     return (r.json(), r.headers["Link"])
-                else:
-                    return (r.json(), "")
+                return (r.json(), "")
             except HTTPError as e:
                 if e.response is None or e.response.status_code < 500:
                     raise
@@ -103,8 +102,7 @@ class CanvasAPI:
                 r.raise_for_status()
                 if "Link" in r.headers:
                     return (r.json(), r.headers["Link"])
-                else:
-                    return (r.json(), "")
+                return (r.json(), "")
             except HTTPError as e:
                 if e.response is None or e.response.status_code < 500:
                     raise
