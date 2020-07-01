@@ -145,19 +145,6 @@ class CanvasAPI:
             raiseCourseNotFound(e)
             raise
 
-    def get_student_from_username(self, course_id: str, sis_user_id: str):
-        try:
-            params = {"per_page": 50}
-            result = self._get_all_pages(
-                "/api/v1/courses/%s/users/sis_user_id:%s" % (course_id, sis_user_id),
-                params,
-            )
-            return result
-
-        except HTTPError as e:
-            raiseStudentNotFound(e)
-            raise
-
     def get_course_assignments(self, course_id: str, search_term: str = ""):
         try:
             params = {"per_page": 50}
