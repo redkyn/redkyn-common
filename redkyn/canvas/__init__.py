@@ -157,33 +157,6 @@ class CanvasAPI:
             raiseCourseNotFound(e)
             raise
 
-    def get_assignment_unlock_time(self, course_id: str, assignment_id: str) -> str:
-        try:
-            params = {}
-            result = self._get_all_pages(
-                "/api/v1/courses/%s/assignments/%s" % (course_id, assignment_id), params
-            )
-            return result["unlock_at"]
-
-        except HTTPError as e:
-            raiseCourseNotFound(e)
-            raise
-
-    def set_assignment_unlock_time(
-        self, course_id: str, assignment_id: str, new_time: str
-    ) -> str:
-        params = {"assignment[unlock_at]": new_time}
-        try:
-            result = self._put_request(
-                "/api/v1/courses/%s/assignments/%s" % (course_id, assignment_id),
-                params,
-            )
-            return result
-
-        except HTTPError as e:
-            raiseCourseNotFound(e)
-            raise
-
     def put_assignment_submission(
         self, course_id: str, assignment_id: str, student_id: str, score: float
     ):
