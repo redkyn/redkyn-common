@@ -1,3 +1,7 @@
+## Devel
+
+- Official support for Python 3.9
+
 ## 1.1.0
 
 - Add support for fetching course assignments from Canvas
